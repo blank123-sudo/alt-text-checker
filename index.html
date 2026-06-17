@@ -444,33 +444,65 @@
             let missingAlt = 0;
 
             images.forEach(img => {
-                let src = img.getAttribute('src') || '';
+                // 1. SMART LAZY-LOAD DETECTION
+                let src = img.getAttribute('data-src') || 
+                          img.getAttribute('data-lazy-src') || 
+                          img.getAttribute('data-original') || 
+                          img.getAttribute('src') || '';
+                          
+                if (src.startsWith('data:image/svg+xml') && img.getAttribute('srcset')) {
+                    const srcSetList = img.getAttribute('srcset').split(',');
+                    if(srcSetList.length > 0) {
+                        src = srcSetList[0].trim().split(' ')[0];
+                    }
+                }
+
                 const alt = img.getAttribute('alt');
-                const hasAlt = alt !== null;
+                
+                // 2. EXTRA-STRICT ALT CLASSIFICATION
+                const hasAltAttr = alt !== null;
+                const isAltTrailingEmpty = hasAltAttr && alt.trim() === "";
+                
+                let badgeClass = 'fail';
+                let badgeText = '✗ Missing Alt';
+                let cardBorderClass = 'missing';
 
-                if (hasAlt) validAlt++; else missingAlt++;
+                if (hasAltAttr) {
+                    if (isAltTrailingEmpty) {
+                        badgeClass = 'fail'; 
+                        badgeText = '⚠ Decorative (Empty)';
+                        cardBorderClass = 'missing'; 
+                        missingAlt++; 
+                    } else {
+                        badgeClass = 'pass';
+                        badgeText = '✓ Has Alt';
+                        cardBorderClass = 'has-alt';
+                        validAlt++;
+                    }
+                } else {
+                    missingAlt++;
+                }
 
-                // FIXED: Use absolute resolution engine against the actual page URL context
+                // 3. ABSOLUTE PATH CONTEXTUAL RESOLUTION Engine
                 if (src && !/^https?:\/\//i.test(src) && !src.startsWith('data:')) {
                     try {
                         src = new URL(src, url).href;
                     } catch(e) {
-                        // Fallback alternative just in case base path fails
                         src = globalBaseUrl + (src.startsWith('/') ? '' : '/') + src;
                     }
                 }
 
                 const card = document.createElement('div');
-                card.className = `img-card ${hasAlt ? 'has-alt' : 'missing'}`;
+                card.className = `img-card ${cardBorderClass}`;
                 card.innerHTML = `
                     <div class="img-container">
                         <img src="${src || 'https://placehold.co/150?text=No+Src'}" onerror="this.src='https://placehold.co/150?text=Protected+Asset'">
                     </div>
                     <div class="img-info">
-                        <span class="badge ${hasAlt ? 'pass' : 'fail'}">
-                            ${hasAlt ? '✓ Has Alt' : '✗ Missing Alt'}
+                        <span class="badge ${badgeClass}">
+                            ${badgeText}
                         </span>
-                        <p class="alt-text"><strong>Alt:</strong> ${hasAlt ? (alt.trim() === "" ? '<em>Empty ("")</em>' : escapeHTML(alt)) : 'None'}</p>
+                        <p class="alt-text"><strong>Alt:</strong> ${hasAltAttr ? (isAltTrailingEmpty ? '<em>Empty ("")</em>' : escapeHTML(alt)) : 'None'}</p>
                     </div>
                 `;
                 resultsDiv.appendChild(card);
