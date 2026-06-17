@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hybrid Accessibility Auditor</title>
+    <title>Universal Alt Text Auditor</title>
+    <script src="https://js.puter.com/v2/"></script>
     <style>
         :root {
             --primary: #4f46e5;
             --success: #16a34a;
             --danger: #dc2626;
-            --warning: #eab308;
             --bg: #f8fafc;
             --card: #ffffff;
             --text: #1e293b;
@@ -21,18 +21,18 @@
             color: var(--text);
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1.5rem 1rem;
+            padding: 2rem 1rem;
         }
 
         h1 { text-align: center; color: var(--primary); margin-bottom: 0.5rem; }
-        p.subtitle { text-align: center; color: #64748b; margin-bottom: 2rem; font-size: 0.95rem; }
+        p.subtitle { text-align: center; color: #64748b; margin-bottom: 2rem; }
 
         .control-panel {
             background: var(--card);
             padding: 1.5rem;
             border-radius: 8px;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             display: flex;
             gap: 12px;
         }
@@ -60,17 +60,16 @@
 
         .app-layout {
             display: grid;
-            grid-template-columns: 340px 1fr;
+            grid-template-columns: 350px 1fr;
             gap: 1.5rem;
-            margin-top: 1.5rem;
         }
 
-        .sidebar {
+        .page-sidebar {
             background: var(--card);
             padding: 1rem;
             border-radius: 8px;
             box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
-            max-height: 650px;
+            max-height: 700px;
             overflow-y: auto;
         }
 
@@ -88,36 +87,36 @@
         .page-item:hover { background: #f1f5f9; }
         .page-item.active { background: #e0e7ff; color: var(--primary); font-weight: bold; }
 
-        .status-badge {
-            font-size: 0.75rem;
-            padding: 0.15rem 0.4rem;
-            border-radius: 4px;
-            font-weight: bold;
-            background: #e2e8f0;
-            color: #64748b;
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #cbd5e1;
+            display: inline-block;
+            flex-shrink: 0;
+            margin-left: 5px;
         }
-        .status-badge.loading { background: #fef9c3; color: var(--warning); }
-        .status-badge.done { background: #dcfce7; color: var(--success); }
-        .status-badge.fail { background: #fee2e2; color: var(--danger); }
+        .status-dot.loading { background-color: #eab308; animation: pulse 1s infinite; }
+        .status-dot.done { background-color: var(--success); }
+        .status-dot.fail { background-color: var(--danger); }
 
-        .workspace {
+        .audit-workspace {
             background: var(--card);
             padding: 1.5rem;
             border-radius: 8px;
             box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
         }
 
-        .status-banner {
+        .status-msg {
             padding: 1rem;
             background: #f1f5f9;
             border-radius: 6px;
             font-weight: 500;
             margin-bottom: 1.5rem;
             text-align: center;
-            font-size: 0.95rem;
         }
 
-        .override-box {
+        .fallback-input-area {
             background: #fff5f5;
             border: 1px dashed var(--danger);
             padding: 1.25rem;
@@ -125,7 +124,7 @@
             margin-bottom: 1.5rem;
         }
 
-        .stats-grid {
+        .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
@@ -139,12 +138,12 @@
             text-align: center;
             border: 1px solid #e2e8f0;
         }
-        .stat-card h3 { margin: 0; font-size: 1.4rem; }
+        .stat-card h3 { margin: 0; font-size: 1.3rem; }
         .stat-card p { margin: 0.25rem 0 0 0; color: #64748b; font-size: 0.8rem; }
 
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 1rem;
         }
 
@@ -161,7 +160,7 @@
         .img-card.has-alt { border-top-color: var(--success); }
 
         .img-container {
-            height: 110px;
+            height: 120px;
             background: #e2e8f0;
             display: flex;
             align-items: center;
@@ -182,7 +181,7 @@
         .badge.fail { background: #fee2e2; color: var(--danger); }
 
         .alt-text {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             word-break: break-all;
             color: #475569;
             background: #ffffff;
@@ -191,54 +190,44 @@
             border-radius: 4px;
             margin: 0;
         }
+
+        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
     </style>
 </head>
 <body>
 
-    <h1>Hybrid Website Accessibility Auditor</h1>
-    <p class="subtitle">W3Schools Edition • Scrapes Automatically, with Manual Override for Blocked Sites</p>
+    <h1>Universal Accessibility Auditor</h1>
+    <p class="subtitle">Scans target site profiles automatically, with instant local overrides for firewalled sites</p>
 
     <div class="control-panel">
-        <input type="url" id="targetUrlInput" value="https://www.ittakesafamilyllc.com/sitemap">
-        <button id="actionBtn" onclick="startHybridCrawl()">Scan Website</button>
+        <input type="url" id="sitemapUrl" placeholder="Enter target page or sitemap URL (e.g., https://www.w3schools.com/sitemap.xml)">
+        <button id="startBtn" onclick="runUniversalAudit()">Run Audit Scan</button>
     </div>
 
-    <div id="sitemapFallbackBlock" class="override-box" style="display: none; max-width: 1160px; margin: 0 auto 1.5rem auto;">
-        <h4 style="margin-top: 0; color: var(--danger);">Sitemap Connection Blocked</h4>
-        <p style="font-size: 0.875rem; margin-bottom: 0.75rem;">Your website firewall blocked the automated script. Let's feed it the sitemap source code directly:</p>
-        <ol style="font-size: 0.85rem; padding-left: 20px; margin-bottom: 1rem;">
-            <li>Open <a href="https://www.ittakesafamilyllc.com/sitemap" target="_blank" style="font-weight: bold; color: var(--primary);">your sitemap page ↗</a> in a new tab.</li>
-            <li>Right-click anywhere on the page → choose <strong>View Page Source</strong>.</li>
-            <li>Press <code>Ctrl+A</code> (Select All), copy it, and paste it right here:</li>
-        </ol>
-        <textarea id="sitemapHtmlPaste" placeholder="Paste sitemap raw HTML view source code here..." style="width:100%; height: 90px; margin-bottom: 0.75rem; box-sizing: border-box;"></textarea>
-        <button onclick="processPastedSitemapSource()" style="background-color: #0f172a;">Extract Sitemap Links</button>
-    </div>
-
-    <div class="app-layout" id="appLayout" style="display: none;">
+    <div class="app-layout" id="appInterface" style="display: none;">
         
-        <div class="sidebar">
-            <h4 style="margin-top: 0; margin-bottom: 0.5rem; color: var(--primary);">Page Inventory (<span id="queueCount">0</span>)</h4>
+        <div class="page-sidebar">
+            <h4 style="margin-top: 0; margin-bottom: 0.5rem; color: var(--primary);">Discovered Index (<span id="linkCount">1</span>)</h4>
             <div id="linksList"></div>
         </div>
 
-        <div class="workspace">
-            <h3 id="activePageTitle" style="margin-top: 0; font-size: 1.05rem; color: var(--primary); word-break: break-all;">Diagnostic Terminal</h3>
-            <div id="statusBanner" class="status-banner">Select a listing line item...</div>
+        <div class="audit-workspace">
+            <h3 id="activePageTitle" style="margin-top: 0; font-size: 1.1rem; color: var(--primary); word-break: break-all;">Target Page</h3>
+            <div id="statusMessage" class="status-msg">Processing...</div>
 
-            <div id="pageFallbackBlock" class="override-box" style="display: none;">
-                <h4 style="margin-top: 0; color: var(--danger);">🛡️ Page Firewall Override Active</h4>
-                <p style="font-size: 0.85rem; margin-bottom: 0.5rem;">This specific subpage blocked automated access. Drop the page's source code here to analyze it:</p>
-                <ol style="font-size: 0.85rem; padding-left: 20px; margin-bottom: 0.75rem;">
-                    <li>Visit <a id="targetFallbackLink" href="#" target="_blank" style="font-weight: bold; color: var(--primary);">this target subpage link ↗</a>.</li>
-                    <li>Right-click → select <strong>View Page Source</strong>.</li>
-                    <li>Copy everything and paste it right here:</li>
+            <div id="manualFallbackBlock" class="fallback-input-area" style="display: none;">
+                <h4 style="margin-top: 0; color: var(--danger);">🛡️ Security Firewall Override Activated</h4>
+                <p style="font-size: 0.85rem; margin: 0.5rem 0;">The target site or your network blocked our automated bot checker. You can bypass this instantly:</p>
+                <ol style="font-size: 0.85rem; padding-left: 20px; margin-bottom: 1rem;">
+                    <li>Open <a id="targetFallbackLink" href="#" target="_blank" style="font-weight: bold;">this target page URL ↗</a> in a separate tab.</li>
+                    <li>Right-click the page → select <strong>View Page Source</strong> (or press <code>Ctrl+U</code>).</li>
+                    <li>Select everything (<code>Ctrl+A</code>), copy it (<code>Ctrl+C</code>), and paste it right here:</li>
                 </ol>
-                <textarea id="pageHtmlPaste" placeholder="Paste this individual page's View Source code here..." style="width: 100%; height: 90px; margin-bottom: 0.5rem; box-sizing: border-box;"></textarea>
-                <button onclick="processPastedPageSource()" style="background-color: #0f172a; font-size: 0.85rem; padding: 0.5rem 1rem;">Run Manual Page Audit</button>
+                <textarea id="fallbackHtmlPaste" placeholder="Paste raw page code here..." style="width: 100%; height: 100px; display: block; margin-bottom: 0.75rem; box-sizing: border-box;"></textarea>
+                <button onclick="processDirectHtmlBypass()" style="background-color: #0f172a; padding: 0.5rem 1rem; font-size: 0.9rem;">Analyze Pasted Code</button>
             </div>
 
-            <div id="statsContainer" style="display: none;" class="stats-grid">
+            <div id="statsContainer" style="display: none;" class="stats">
                 <div class="stat-card"><h3 id="totalImages">0</h3><p>Total Images</p></div>
                 <div class="stat-card" style="color: var(--success);"><h3 id="goodImages">0</h3><p>Has Alt Text</p></div>
                 <div class="stat-card" style="color: var(--danger);"><h3 id="badImages">0</h3><p>Missing Alt Text</p></div>
@@ -250,185 +239,209 @@
     </div>
 
     <script>
-        let pageCache = {};
-        let linksQueue = [];
-        let rootOrigin = "";
+        let cachedPageHTMLs = {};
+        let linkDirectory = [];
+        let globalBaseUrl = "";
         let currentlySelectedUrl = "";
         let currentlySelectedIndex = 0;
 
-        async function fetchPageViaProxy(url) {
-            const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-            const resp = await fetch(proxy);
-            if (!resp.ok) throw new Error();
-            const data = await resp.json();
-            return data.contents;
-        }
-
-        async function startHybridCrawl() {
-            const inputUrl = document.getElementById('targetUrlInput').value.trim();
-            const btn = document.getElementById('actionBtn');
+        async function runUniversalAudit() {
+            const inputUrl = document.getElementById('sitemapUrl').value.trim();
+            const startBtn = document.getElementById('startBtn');
+            const statusMessage = document.getElementById('statusMessage');
             
             if (!inputUrl) return alert("Please specify a target website URL.");
-            
-            btn.disabled = true;
-            document.getElementById('sitemapFallbackBlock').style.display = 'none';
-            document.getElementById('appLayout').style.display = 'none';
 
+            startBtn.disabled = true;
+            document.getElementById('appInterface').style.display = 'grid';
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('statsContainer').style.display = 'none';
+            document.getElementById('manualFallbackBlock').style.display = 'none';
+            
             try {
-                rootOrigin = new URL(inputUrl).origin;
-            } catch(e) {
-                alert("Invalid URL syntax formatting.");
-                btn.disabled = false;
+                const parsed = new URL(inputUrl.startsWith('http') ? inputUrl : 'https://' + inputUrl);
+                globalBaseUrl = parsed.origin;
+                currentlySelectedUrl = parsed.href;
+            } catch (e) {
+                alert("Invalid web URL parameters.");
+                startBtn.disabled = false;
                 return;
             }
 
+            statusMessage.textContent = "Attempting background crawl sequence configuration...";
+            
             try {
-                const html = await fetchPageViaProxy(inputUrl);
-                buildInventoryList(html);
-            } catch(e) {
-                // Sitemap itself is blocked -> reveal sitemap text override paste panel
-                document.getElementById('sitemapFallbackBlock').style.display = 'block';
-                btn.disabled = false;
+                const response = await puter.net.fetch(currentlySelectedUrl);
+                const htmlContent = await response.text();
+                
+                if (currentlySelectedUrl.includes('sitemap') || htmlContent.includes('<sitemap') || htmlContent.includes('</a>')) {
+                    statusMessage.textContent = "Index page structure scanned. Populating layout profiles...";
+                    extractLinksFromStructure(htmlContent);
+                } else {
+                    linkDirectory = [currentlySelectedUrl];
+                    buildSidebarUI();
+                    cachedPageHTMLs[currentlySelectedUrl] = htmlContent;
+                    updateItemStatusMarker(0, 'done');
+                    viewAuditedPageResults(currentlySelectedUrl, 0);
+                    statusMessage.textContent = "Single page automated scan complete!";
+                    startBtn.disabled = false;
+                }
+            } catch (error) {
+                linkDirectory = [currentlySelectedUrl];
+                buildSidebarUI();
+                updateItemStatusMarker(0, 'fail');
+                triggerManualFallbackWorkspace(currentlySelectedUrl, 0, "Automated connections blocked by site firewall security.");
+                startBtn.disabled = false;
             }
         }
 
-        function processPastedSitemapSource() {
-            const code = document.getElementById('sitemapHtmlPaste').value.trim();
-            if(!code) return alert("Please copy and paste the raw view source code text.");
-            
-            document.getElementById('sitemapFallbackBlock').style.display = 'none';
-            buildInventoryList(code);
-        }
-
-        function buildInventoryList(htmlContent) {
+        function extractLinksFromStructure(htmlContent) {
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlContent, 'text/html');
             const anchors = doc.querySelectorAll('a');
             
-            linksQueue = [];
+            linkDirectory = [];
+            
             anchors.forEach(a => {
                 let href = a.getAttribute('href');
-                if (href && href.startsWith('/') && !href.startsWith('//')) href = rootOrigin + href;
-                if (href && href.startsWith(rootOrigin) && !linksQueue.includes(href)) linksQueue.push(href);
+                if (href && href.startsWith('/') && !href.startsWith('//')) href = globalBaseUrl + href;
+                if (href && href.startsWith(globalBaseUrl) && !linkDirectory.includes(href)) {
+                    linkDirectory.push(href);
+                }
             });
 
-            if (linksQueue.length === 0) {
-                doc.querySelectorAll('loc').forEach(l => {
-                    const txt = l.textContent.trim();
-                    if (txt && !linksQueue.includes(txt)) linksQueue.push(txt);
+            if (linkDirectory.length === 0) {
+                const locs = doc.querySelectorAll('loc');
+                locs.forEach(loc => {
+                    const text = loc.textContent.trim();
+                    if (text && !linkDirectory.includes(text)) linkDirectory.push(text);
                 });
             }
 
-            if (linksQueue.length === 0) {
-                linksQueue = [document.getElementById('targetUrlInput').value.trim()];
+            if (linkDirectory.length === 0) {
+                linkDirectory = [currentlySelectedUrl];
             }
 
-            document.getElementById('queueCount').textContent = linksQueue.length;
-            
-            const container = document.getElementById('linksList');
-            container.innerHTML = '';
-            linksQueue.forEach((url, idx) => {
-                const div = document.createElement('div');
-                div.className = 'page-item';
-                div.id = `page-row-${idx}`;
-                div.innerHTML = `
-                    <span>Page ${idx + 1}: ${url.replace(rootOrigin, '') || '/'}</span>
-                    <span class="status-badge" id="badge-${idx}">Queued</span>
-                `;
-                div.onclick = () => selectPageRowItem(url, idx);
-                container.appendChild(div);
-            });
-
-            document.getElementById('appLayout').style.display = 'grid';
-            runAutomatedCrawlLoop();
+            buildSidebarUI();
+            crawlDirectorySequentially();
         }
 
-        async function runAutomatedCrawlLoop() {
-            document.getElementById('statusBanner').textContent = "Automated crawl running in background...";
+        function buildSidebarUI() {
+            document.getElementById('linkCount').textContent = linkDirectory.length;
+            const sidebar = document.getElementById('linksList');
+            sidebar.innerHTML = '';
+
+            linkDirectory.forEach((link, idx) => {
+                const item = document.createElement('div');
+                item.className = 'page-item';
+                item.id = `page-item-${idx}`;
+                item.innerHTML = `
+                    <span>Page ${idx + 1}: ${link.replace(globalBaseUrl, '') || '/ (Home)'}</span>
+                    <span class="status-dot" id="dot-${idx}"></span>
+                `;
+                item.onclick = () => {
+                    if (cachedPageHTMLs[link] === null || cachedPageHTMLs[link] === undefined) {
+                        triggerManualFallbackWorkspace(link, idx);
+                    } else {
+                        viewAuditedPageResults(link, idx);
+                    }
+                };
+                sidebar.appendChild(item);
+            });
+        }
+
+        async function crawlDirectorySequentially() {
+            const statusMessage = document.getElementById('statusMessage');
             
-            for (let i = 0; i < linksQueue.length; i++) {
-                const url = linksQueue[i];
-                updateRowBadge(i, 'loading', 'Scanning');
+            for (let i = 0; i < linkDirectory.length; i++) {
+                const currentUrl = linkDirectory[i];
+                updateItemStatusMarker(i, 'loading');
+
                 try {
-                    const html = await fetchPageViaProxy(url);
-                    pageCache[url] = html;
-                    updateRowBadge(i, 'done', 'Ready');
-                    if (i === 0) selectPageRowItem(url, 0);
-                } catch(e) {
-                    pageCache[url] = null; // Mark as blocked
-                    updateRowBadge(i, 'fail', 'Blocked');
-                    if (i === 0) selectPageRowItem(url, 0);
+                    const response = await puter.net.fetch(currentUrl);
+                    const htmlText = await response.text();
+                    cachedPageHTMLs[currentUrl] = htmlText;
+                    updateItemStatusMarker(i, 'done');
+                } catch (e) {
+                    updateItemStatusMarker(i, 'fail');
+                    cachedPageHTMLs[currentUrl] = null;
                 }
             }
-            document.getElementById('statusBanner').textContent = "Crawl finished! Select any blocked items to patch them manually.";
-            document.getElementById('actionBtn').disabled = false;
+
+            statusMessage.textContent = "✅ Scan complete! Review verified links inside the layout tracking sidebar panel.";
+            document.getElementById('startBtn').disabled = false;
+
+            if (linkDirectory.length > 0) {
+                if (cachedPageHTMLs[linkDirectory[0]] === null) {
+                    triggerManualFallbackWorkspace(linkDirectory[0], 0);
+                } else {
+                    viewAuditedPageResults(linkDirectory[0], 0);
+                }
+            }
         }
 
-        function updateRowBadge(idx, cls, txt) {
-            const b = document.getElementById(`badge-${idx}`);
-            if (b) { b.className = `status-badge ${cls}`; b.textContent = txt; }
+        function updateItemStatusMarker(index, statusClass) {
+            const dot = document.getElementById(`dot-${index}`);
+            if (dot) dot.className = `status-dot ${statusClass}`;
         }
 
-        function selectPageRowItem(url, index) {
+        function triggerManualFallbackWorkspace(url, index, customMsg = "") {
             currentlySelectedUrl = url;
             currentlySelectedIndex = index;
 
-            document.querySelectorAll('.page-item').forEach(r => r.classList.remove('active'));
-            const r = document.getElementById(`page-row-${index}`);
-            if (r) r.classList.add('active');
+            document.querySelectorAll('.page-item').forEach(el => el.classList.remove('active'));
+            const activeItem = document.getElementById(`page-item-${index}`);
+            if (activeItem) activeItem.classList.add('active');
 
-            document.getElementById('activePageTitle').innerHTML = `Active Page: <a href="${url}" target="_blank">${url} ↗</a>`;
+            document.getElementById('activePageTitle').innerHTML = `Auditing: <a href="${url}" target="_blank">${url} ↗</a>`;
+            document.getElementById('statusMessage').textContent = customMsg || "❌ Background verification blocked by cloud security configurations.";
             
-            const content = pageCache[url];
+            document.getElementById('targetFallbackLink').href = url;
+            document.getElementById('fallbackHtmlPaste').value = '';
+            document.getElementById('manualFallbackBlock').style.display = 'block';
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('statsContainer').style.display = 'none';
+        }
+
+        function processDirectHtmlBypass() {
+            const rawInputHtml = document.getElementById('fallbackHtmlPaste').value.trim();
+            if (!rawInputHtml) return alert("Please input or paste the source verification tracking blocks.");
+
+            cachedPageHTMLs[currentlySelectedUrl] = rawInputHtml;
+            updateItemStatusMarker(currentlySelectedIndex, 'done');
+            document.getElementById('manualFallbackBlock').style.display = 'none';
+            viewAuditedPageResults(currentlySelectedUrl, currentlySelectedIndex);
+        }
+
+        function viewAuditedPageResults(url, index) {
+            document.getElementById('manualFallbackBlock').style.display = 'none';
+            
+            document.querySelectorAll('.page-item').forEach(el => el.classList.remove('active'));
+            const activeItem = document.getElementById(`page-item-${index}`);
+            if (activeItem) activeItem.classList.add('active');
+
+            document.getElementById('activePageTitle').innerHTML = `Viewing Report: <a href="${url}" target="_blank">${url} ↗</a>`;
+            document.getElementById('statusMessage').textContent = "Displaying interactive image diagnostic validation grid charts.";
+
+            const rawHTML = cachedPageHTMLs[url];
             const resultsDiv = document.getElementById('results');
             const statsContainer = document.getElementById('statsContainer');
-            const manualBox = document.getElementById('pageFallbackBlock');
 
             resultsDiv.innerHTML = '';
-            statsContainer.style.display = 'none';
-            manualBox.style.display = 'none';
 
-            if (content === undefined) {
-                document.getElementById('statusBanner').textContent = "⏳ Page is currently queued in the automated crawler loop.";
-                return;
-            }
-
-            if (content === null) {
-                document.getElementById('statusBanner').textContent = "🛡️ Security filter blocked automated access to this subpage link.";
-                document.getElementById('targetFallbackLink').href = url;
-                document.getElementById('pageHtmlPaste').value = '';
-                manualBox.style.display = 'block';
-                return;
-            }
-
-            document.getElementById('statusBanner').textContent = "Showing automated scan results.";
-            runImageAuditAnalysis(content);
-        }
-
-        function processPastedPageSource() {
-            const rawHtml = document.getElementById('pageHtmlPaste').value.trim();
-            if (!rawHtml) return alert("Please paste the page source code code text.");
-            
-            pageCache[currentlySelectedUrl] = rawHtml;
-            updateRowBadge(currentlySelectedIndex, 'done', 'Ready');
-            document.getElementById('pageFallbackBlock').style.display = 'none';
-            runImageAuditAnalysis(rawHtml);
-        }
-
-        function runImageAuditAnalysis(htmlCode) {
-            const resultsDiv = document.getElementById('results');
-            const statsContainer = document.getElementById('statsContainer');
-            
             const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlCode, 'text/html');
+            const doc = parser.parseFromString(rawHTML, 'text/html');
             const images = doc.querySelectorAll('img');
 
             if (images.length === 0) {
-                resultsDiv.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 2rem;">No image tags found inside this page source text code.</p>`;
+                resultsDiv.innerHTML = `<p style='grid-column:1/-1; text-align:center; padding:2rem; color:#64748b;'>No element image structures located on this index view profile.</p>`;
+                statsContainer.style.display = 'none';
                 return;
             }
 
-            let total = images.length, validAlt = 0, missingAlt = 0;
+            let total = images.length;
+            let validAlt = 0;
+            let missingAlt = 0;
 
             images.forEach(img => {
                 let src = img.getAttribute('src') || '';
@@ -437,8 +450,14 @@
 
                 if (hasAlt) validAlt++; else missingAlt++;
 
+                // FIXED: Use absolute resolution engine against the actual page URL context
                 if (src && !/^https?:\/\//i.test(src) && !src.startsWith('data:')) {
-                    src = rootOrigin + (src.startsWith('/') ? '' : '/') + src;
+                    try {
+                        src = new URL(src, url).href;
+                    } catch(e) {
+                        // Fallback alternative just in case base path fails
+                        src = globalBaseUrl + (src.startsWith('/') ? '' : '/') + src;
+                    }
                 }
 
                 const card = document.createElement('div');
