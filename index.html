@@ -8,84 +8,200 @@
     <style>
         :root {
             --primary: #4f46e5;
-            --success: #16a34a;
-            --danger: #dc2626;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --warning: #f59e0b;
             --bg: #f8fafc;
             --card: #ffffff;
-            --text: #1e293b;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            --transition: all 0.2s ease-in-out;
         }
 
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg);
-            color: var(--text);
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem 1.5rem;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
-        h1 { text-align: center; color: var(--primary); margin-bottom: 0.5rem; }
-        p.subtitle { text-align: center; color: #64748b; margin-bottom: 2rem; }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 { 
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            color: var(--text-main); 
+            margin: 0 0 0.5rem 0; 
+        }
+        
+        p.subtitle { 
+            font-size: 1.05rem;
+            color: var(--text-muted); 
+            margin: 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Control Panel */
         .control-panel {
             background: var(--card);
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            padding: 1.25rem;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 4px 18px -4px rgba(15, 23, 42, 0.05);
+            border: 1px solid var(--border);
             margin-bottom: 2rem;
             display: flex;
+            flex-direction: column;
             gap: 12px;
         }
 
-        input, textarea {
+        @media (min-width: 640px) {
+            .control-panel {
+                flex-direction: row;
+            }
+        }
+
+        input[type="url"], textarea {
             flex: 1;
-            padding: 0.75rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 1rem;
+            padding: 0.85rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
             font-family: inherit;
+            color: var(--text-main);
+            background-color: #ffffff;
+            transition: var(--transition);
+        }
+
+        input[type="url"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
         }
 
         button {
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 0.75rem 1.75rem;
-            border-radius: 6px;
+            padding: 0.85rem 2rem;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
         }
-        button:hover { opacity: 0.9; }
-        button:disabled { background-color: #94a3b8; cursor: not-allowed; }
+        
+        button:hover { 
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled { 
+            background-color: #cbd5e1; 
+            color: #94a3b8;
+            cursor: not-allowed; 
+            transform: none;
+        }
 
+        /* Layout Grid */
         .app-layout {
             display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 1.5rem;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            align-items: start;
         }
 
+        @media (min-width: 1024px) {
+            .app-layout {
+                grid-template-columns: 360px 1fr;
+            }
+        }
+
+        /* Sidebar Directory */
         .page-sidebar {
             background: var(--card);
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
-            max-height: 700px;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            max-height: 400px;
             overflow-y: auto;
         }
 
+        @media (min-width: 1024px) {
+            .page-sidebar {
+                max-height: 750px;
+                position: sticky;
+                top: 2rem;
+            }
+        }
+
+        .sidebar-header {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-counter {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
         .page-item {
-            padding: 0.75rem;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--bg);
             cursor: pointer;
-            border-radius: 4px;
-            font-size: 0.85rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
             word-break: break-all;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
+            margin-bottom: 4px;
+            transition: var(--transition);
         }
-        .page-item:hover { background: #f1f5f9; }
-        .page-item.active { background: #e0e7ff; color: var(--primary); font-weight: bold; }
+        
+        .page-item:hover { background: var(--bg); }
+        
+        .page-item.active { 
+            background: var(--primary-light); 
+            color: var(--primary); 
+            font-weight: 600; 
+        }
 
         .status-dot {
             width: 8px;
@@ -94,149 +210,230 @@
             background-color: #cbd5e1;
             display: inline-block;
             flex-shrink: 0;
-            margin-left: 5px;
         }
-        .status-dot.loading { background-color: #eab308; animation: pulse 1s infinite; }
+        .status-dot.loading { background-color: var(--warning); animation: pulse 1.2s infinite; }
         .status-dot.done { background-color: var(--success); }
         .status-dot.fail { background-color: var(--danger); }
 
+        /* Main Workspace Content Area */
         .audit-workspace {
             background: var(--card);
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+            padding: 1.75rem;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        #activePageTitle { 
+            margin-top: 0; 
+            font-size: 1.3rem; 
+            font-weight: 700;
+            color: var(--text-main); 
+            word-break: break-all;
+            margin-bottom: 1rem;
+        }
+        
+        #activePageTitle a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        #activePageTitle a:hover {
+            text-decoration: underline;
         }
 
         .status-msg {
-            padding: 1rem;
-            background: #f1f5f9;
-            border-radius: 6px;
+            padding: 0.85rem 1.25rem;
+            background: var(--bg);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            color: var(--text-muted);
             font-weight: 500;
-            margin-bottom: 1.5rem;
-            text-align: center;
+            margin-bottom: 1.75rem;
+            border-left: 4px solid var(--primary);
         }
 
+        /* Firewall Override Block */
         .fallback-input-area {
-            background: #fff5f5;
+            background: var(--danger-light);
             border: 1px dashed var(--danger);
-            padding: 1.25rem;
-            border-radius: 6px;
-            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.75rem;
         }
 
+        .fallback-input-area h4 { margin-top: 0; font-size: 1.1rem; color: #b91c1c; display: flex; align-items: center; gap: 8px; }
+        .fallback-input-area p { font-size: 0.9rem; color: #7f1d1d; margin: 0.5rem 0 1rem 0; }
+        .fallback-input-area ol { font-size: 0.9rem; color: #7f1d1d; padding-left: 20px; margin-bottom: 1.25rem; }
+        .fallback-input-area ol li { margin-bottom: 0.4rem; }
+        .fallback-input-area textarea { margin-bottom: 1rem; background: #ffffff; }
+
+        /* Analytics Metric Cards */
         .stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 1fr;
             gap: 1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 480px) {
+            .stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         .stat-card {
-            background: #f8fafc;
-            padding: 0.75rem;
-            border-radius: 6px;
+            background: var(--bg);
+            padding: 1.25rem 1rem;
+            border-radius: var(--radius-lg);
             text-align: center;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
+            transition: var(--transition);
         }
-        .stat-card h3 { margin: 0; font-size: 1.3rem; }
-        .stat-card p { margin: 0.25rem 0 0 0; color: #64748b; font-size: 0.8rem; }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+        .stat-card h3 { margin: 0; font-size: 1.75rem; font-weight: 800; color: var(--text-main); }
+        .stat-card p { margin: 0.35rem 0 0 0; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
 
+        /* Report Image Display Matrices */
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.25rem;
         }
 
         .img-card {
-            background: #f8fafc;
-            border-radius: 6px;
+            background: var(--card);
+            border-radius: var(--radius-lg);
             overflow: hidden;
-            border-top: 4px solid #cbd5e1;
             display: flex;
             flex-direction: column;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
+            transition: var(--transition);
         }
-        .img-card.missing { border-top-color: var(--danger); }
-        .img-card.has-alt { border-top-color: var(--success); }
+        
+        .img-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -8px rgba(15, 23, 42, 0.08);
+        }
+        
+        .img-card.missing { border-top: 4px solid var(--danger); }
+        .img-card.has-alt { border-top: 4px solid var(--success); }
 
         .img-container {
-            height: 120px;
-            background: #e2e8f0;
+            height: 160px;
+            background: #f1f5f9;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            border-bottom: 1px solid var(--border);
         }
-        .img-container img { width: 100%; height: 100%; object-fit: scale-down; }
-        .img-info { padding: 0.75rem; flex-grow: 1; }
+        
+        .img-container img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            padding: 8px;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+        
+        .img-card:hover .img-container img {
+            transform: scale(1.03);
+        }
+        
+        .img-info { 
+            padding: 1rem; 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-start;
+            gap: 8px;
+        }
 
         .badge {
-            display: inline-block;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            margin-bottom: 0.4rem;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
         }
-        .badge.pass { background: #dcfce7; color: var(--success); }
-        .badge.fail { background: #fee2e2; color: var(--danger); }
+        .badge.pass { background: var(--success-light); color: var(--success); }
+        .badge.fail { background: var(--danger-light); color: var(--danger); }
 
         .alt-text {
-            font-size: 0.8rem;
+            font-size: 0.825rem;
             word-break: break-all;
-            color: #475569;
-            background: #ffffff;
-            padding: 0.4rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
+            color: #334155;
+            background: var(--bg);
+            padding: 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
             margin: 0;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+        @keyframes pulse { 
+            0%, 100% { opacity: 0.5; transform: scale(1); } 
+            50% { opacity: 1; transform: scale(1.1); } 
+        }
     </style>
 </head>
 <body>
 
-    <h1>Universal Accessibility Auditor</h1>
-    <p class="subtitle">Scans target site profiles automatically, with instant local overrides for firewalled sites</p>
+    <div class="container">
+        <header>
+            <h1>Universal Accessibility Auditor</h1>
+            <p class="subtitle">Scans target site profiles automatically, with instant local overrides for firewalled sites</p>
+        </header>
 
-    <div class="control-panel">
-        <input type="url" id="sitemapUrl" placeholder="Enter target page or sitemap URL (e.g., https://www.w3schools.com/sitemap.xml)">
-        <button id="startBtn" onclick="runUniversalAudit()">Run Audit Scan</button>
-    </div>
-
-    <div class="app-layout" id="appInterface" style="display: none;">
-        
-        <div class="page-sidebar">
-            <h4 style="margin-top: 0; margin-bottom: 0.5rem; color: var(--primary);">Discovered Index (<span id="linkCount">1</span>)</h4>
-            <div id="linksList"></div>
+        <div class="control-panel">
+            <input type="url" id="sitemapUrl" placeholder="Enter target page or sitemap URL (e.g., https://www.w3schools.com/sitemap.xml)">
+            <button id="startBtn" onclick="runUniversalAudit()">Run Audit Scan</button>
         </div>
 
-        <div class="audit-workspace">
-            <h3 id="activePageTitle" style="margin-top: 0; font-size: 1.1rem; color: var(--primary); word-break: break-all;">Target Page</h3>
-            <div id="statusMessage" class="status-msg">Processing...</div>
-
-            <div id="manualFallbackBlock" class="fallback-input-area" style="display: none;">
-                <h4 style="margin-top: 0; color: var(--danger);">🛡️ Security Firewall Override Activated</h4>
-                <p style="font-size: 0.85rem; margin: 0.5rem 0;">The target site or your network blocked our automated bot checker. You can bypass this instantly:</p>
-                <ol style="font-size: 0.85rem; padding-left: 20px; margin-bottom: 1rem;">
-                    <li>Open <a id="targetFallbackLink" href="#" target="_blank" style="font-weight: bold;">this target page URL ↗</a> in a separate tab.</li>
-                    <li>Right-click the page → select <strong>View Page Source</strong> (or press <code>Ctrl+U</code>).</li>
-                    <li>Select everything (<code>Ctrl+A</code>), copy it (<code>Ctrl+C</code>), and paste it right here:</li>
-                </ol>
-                <textarea id="fallbackHtmlPaste" placeholder="Paste raw page code here..." style="width: 100%; height: 100px; display: block; margin-bottom: 0.75rem; box-sizing: border-box;"></textarea>
-                <button onclick="processDirectHtmlBypass()" style="background-color: #0f172a; padding: 0.5rem 1rem; font-size: 0.9rem;">Analyze Pasted Code</button>
+        <div class="app-layout" id="appInterface" style="display: none;">
+            
+            <div class="page-sidebar">
+                <div class="sidebar-header">
+                    <span>Discovered Index</span>
+                    <span class="sidebar-counter" id="linkCount">1</span>
+                </div>
+                <div id="linksList"></div>
             </div>
 
-            <div id="statsContainer" style="display: none;" class="stats">
-                <div class="stat-card"><h3 id="totalImages">0</h3><p>Total Images</p></div>
-                <div class="stat-card" style="color: var(--success);"><h3 id="goodImages">0</h3><p>Has Alt Text</p></div>
-                <div class="stat-card" style="color: var(--danger);"><h3 id="badImages">0</h3><p>Missing Alt Text</p></div>
+            <div class="audit-workspace">
+                <h3 id="activePageTitle">Target Page</h3>
+                <div id="statusMessage" class="status-msg">Processing...</div>
+
+                <div id="manualFallbackBlock" class="fallback-input-area" style="display: none;">
+                    <h4>🛡️ Security Firewall Override Activated</h4>
+                    <p>The target site or your network blocked our automated bot checker. You can bypass this instantly:</p>
+                    <ol>
+                        <li>Open <a id="targetFallbackLink" href="#" target="_blank" style="font-weight: bold;">this target page URL ↗</a> in a separate tab.</li>
+                        <li>Right-click the page → select <strong>View Page Source</strong> (or press <code>Ctrl+U</code>).</li>
+                        <li>Select everything (<code>Ctrl+A</code>), copy it (<code>Ctrl+C</code>), and paste it right here:</li>
+                    </ol>
+                    <textarea id="fallbackHtmlPaste" placeholder="Paste raw page code here..." style="width: 100%; height: 120px; display: block; box-sizing: border-box;"></textarea>
+                    <button onclick="processDirectHtmlBypass()" style="background-color: #0f172a; padding: 0.6rem 1.2rem; font-size: 0.9rem;">Analyze Pasted Code</button>
+                </div>
+
+                <div id="statsContainer" style="display: none;" class="stats">
+                    <div class="stat-card"><h3 id="totalImages">0</h3><p>Total Images</p></div>
+                    <div class="stat-card" style="color: var(--success);"><h3 id="goodImages">0</h3><p>Has Alt Text</p></div>
+                    <div class="stat-card" style="color: var(--danger);"><h3 id="badImages">0</h3><p>Missing Alt Text</p></div>
+                </div>
+
+                <div id="results" class="results-grid"></div>
             </div>
 
-            <div id="results" class="results-grid"></div>
         </div>
-
     </div>
 
     <script>
